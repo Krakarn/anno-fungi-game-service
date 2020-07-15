@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run build:live",
     "build:live": "nodemon --exec ts-node -- ./index.ts",
+    "build": "parcel build ./index.ts --target node --no-cache --out-file server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p tsconfig.json --type-check index.ts"
   },
@@ -17,11 +18,12 @@
     "@types/uuid": "^8.0.0",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
-    "tslint": "^6.1.2",
-    "typescript": "^3.9.6"
+    "tslint": "^6.1.2"
   },
   "dependencies": {
+    "parcel-bundler": "^1.12.4",
     "socket.io": "^2.0.3",
-    "uuid": "^8.2.0"
+    "uuid": "^8.2.0",
+    "typescript": "^3.9.6"
   }
 }

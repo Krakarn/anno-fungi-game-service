@@ -11,7 +11,7 @@ export const applyEffect = (
   const card = findCard(id);
 
   if (!card) {
-    console.log(`card not found ${id}`);
+    console.error(`card not found ${id}`);
     return;
   }
 
