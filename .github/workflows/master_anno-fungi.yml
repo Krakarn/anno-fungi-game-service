@@ -32,4 +32,4 @@ jobs:
         app-name: 'anno-fungi'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_2d6a64170c6944c8b8130ba34d6086e4 }}
-        package: .
+        package: ./dist
