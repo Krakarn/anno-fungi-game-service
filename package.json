@@ -7,7 +7,7 @@
     "start": "npm run build:live",
     "build:live": "nodemon --exec ts-node -- ./index.ts",
     "build": "parcel build ./index.ts --target node --no-cache --out-file server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No tests.\"",
     "lint": "tslint -p tsconfig.json --type-check index.ts"
   },
   "author": "",
