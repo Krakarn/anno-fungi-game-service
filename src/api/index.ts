@@ -9,7 +9,7 @@ import { createMessageHandler } from './messages';
 import express from 'express';
 import { createServer } from 'http';
 
-const PORT = 8079;
+const PORT = +(process.env.PORT ?? 8079);
 
 export const startGameServer = (port: number = PORT) => {
   const app = express();
