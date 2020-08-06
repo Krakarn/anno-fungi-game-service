@@ -12,6 +12,8 @@ import { createServer } from 'http';
 const PORT = +(process.env.PORT || 8079);
 
 export const startGameServer = (port: number = PORT) => {
+  console.log(`starting server { port: ${port} }`);
+
   const app = express();
   const http = createServer(app);
   const io = socketIo(http);
