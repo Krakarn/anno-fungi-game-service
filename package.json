@@ -10,7 +10,7 @@
     "build:inner": "npm run build:bundle && npm run build:copy && npm run build:install-node-modules",
     "build:bundle": "parcel build ./index.ts --target node --no-cache --out-file server.js",
     "build:copy": "copyfiles package.json package-lock.json web.config dist",
-    "build:install-node-modules": "cd dist && npm install",
+    "build:install-node-modules": "cd dist && npm install && cd ..",
     "test": "echo \"No tests.\"",
     "lint": "tslint -p tsconfig.json --type-check index.ts"
   },
