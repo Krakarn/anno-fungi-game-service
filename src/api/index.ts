@@ -11,9 +11,9 @@ import { createServer } from 'http';
 
 console.log(JSON.stringify(process.env, null, 2));
 
-const PORT = +(process.env.PORT || process.env.SERVER_PORT || 8079);
+const PORT = process.env.PORT || 8079;
 
-export const startGameServer = (port: number = PORT) => {
+export const startGameServer = (port: string | number = PORT) => {
   console.log(`starting server { port: ${port} }`);
 
   const app = express();
