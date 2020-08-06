@@ -5,11 +5,10 @@
     "sourceMap": true,
     "outFile": "./app.js",
     "removeComments": true,
-
     "strict": true,
-
     "moduleResolution": "node",
-
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaults": true
   }
 }

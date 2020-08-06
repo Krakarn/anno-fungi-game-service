@@ -1,3 +1,4 @@
+import 'ws';
 import * as socketIo from 'socket.io';
 import { v1 as uuid } from 'uuid';
 import { IGameInstance, IClient } from './state';
