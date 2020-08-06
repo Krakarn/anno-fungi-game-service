@@ -1,19 +1,32 @@
 import 'ws';
-import * as socketIo from 'socket.io';
+import socketIo from 'socket.io';
 import { v1 as uuid } from 'uuid';
-import { IGameInstance, IClient } from './state';
+import { IGameInstance, IClient, ITicket } from './state';
 import { ProcessClientMessageMap } from './messages/client';
 import { createGame, joinGame, applyEffect } from './game';
 import { createMessageHandler } from './messages';
 
+import express from 'express';
+import { createServer } from 'http';
+
 const PORT = 8079;
 
-export const run = (port: number = PORT) => {
+export const startGameServer = (port: number = PORT) => {
+  const app = express();
+  const http = createServer(app);
+  const io = socketIo(http);
+
+  app.get('/', (req, res) => {
+    res.send('<h1>Server running</h1>');
+    res.end();
+  });
+
+  http.listen(port, () => {
+    console.log(`server listening at port ${port}`);
+  });
+
   const games: IGameInstance[] = [];
   const connections: IClient[] = [];
-
-  const io = socketIo.listen(port);
-  console.log(`server listening at port ${port}`);
 
   io.sockets.on('connection', socket => {
     const client: IClient = {
@@ -22,6 +35,7 @@ export const run = (port: number = PORT) => {
     };
 
     let game: IGameInstance;
+    const ticket: ITicket = { gameId: '', deck: [] };
 
     console.log(`client with id ${client.id} has connected`);
 

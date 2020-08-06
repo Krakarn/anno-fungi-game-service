@@ -10,6 +10,7 @@ export class GameContainer {
   constructor(initialState: IGameState) {
     this.states = [];
     this.actions = [];
+    this.stateBasedEffects = [];
     this.initialState = initialState;
     this.states.push(initialState);
   }

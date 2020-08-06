@@ -9,6 +9,6 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaults": true
+    "allowSyntheticDefaultImports": true
   }
 }
