@@ -9,7 +9,9 @@ import { createMessageHandler } from './messages';
 import express from 'express';
 import { createServer } from 'http';
 
-const PORT = +(process.env.PORT || 8079);
+console.log(JSON.stringify(process.env, null, 2));
+
+const PORT = +(process.env.PORT || process.env.SERVER_PORT || 8079);
 
 export const startGameServer = (port: number = PORT) => {
   console.log(`starting server { port: ${port} }`);
