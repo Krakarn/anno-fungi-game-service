@@ -2,48 +2,120 @@ import 'ws';
 import socketIo from 'socket.io';
 import { v1 as uuid } from 'uuid';
 import { IGameInstance, IClient, ITicket } from './state';
-import { ProcessClientMessageMap } from './messages/client';
 import { createGame, joinGame, applyEffect } from './game';
-import { createMessageHandler } from './messages';
+import { createMessageHandler, ProcessClientMessageMap, UpdateStateServerMessage } from 'anno-fungi-game-common';
 
 import express from 'express';
 import { createServer } from 'http';
 
-console.log(JSON.stringify(process.env, null, 2));
-
 const PORT = process.env.PORT || 8079;
 
+const _theLog: string[] = [];
+
+const log = (msg: string) => {
+  console.log(`[${new Date().toUTCString()}] ${msg}`);
+  _theLog.push(msg);
+};
+
+const registerConnection = (
+  connection: IClient,
+  connections: IClient[],
+  otherConnections: Record<IClient['id'], IClient[]>,
+) => {
+  const otherConnectionsForConnectedClient = connections.slice();
+  connections.push(connection);
+
+  for (let id in otherConnections) {
+    otherConnections[id].push(connection);
+  }
+
+  otherConnections[connection.id] = otherConnectionsForConnectedClient;
+
+  log(`client with id ${connection.id} has connected`);
+};
+
+const registerDisconnection = (
+  connection: IClient,
+  connections: IClient[],
+  otherConnections: Record<IClient['id'], IClient[]>,
+) => {
+  connections.splice(connections.indexOf(connection), 1);
+  delete otherConnections[connection.id];
+
+  for (let id in otherConnections) {
+    otherConnections[id].splice(otherConnections[id].indexOf(connection), 1);
+  }
+
+  log(`client with id ${connection.id} has disconnected`);
+};
+
+const indexHtml = (connections: IClient[]) => `
+<h1>Server running</h1>
+<div>
+  <h2>Connections</h2>
+  <ul>${connections.map(c => `<li>${c.id}</li>`).join('')}</ul>
+  <h2>Log</h2>
+  <ul>${_theLog.map(entry => `<li>${entry}</li>`).join('')}</ul>
+</div>
+`.trim()
+;
+
 export const startGameServer = (port: string | number = PORT) => {
-  console.log(`starting server { port: ${port} }`);
+  log(`starting server { port: ${port} }`);
 
   const app = express();
   const http = createServer(app);
   const io = socketIo(http);
 
+  const games: IGameInstance[] = [];
+  const connections: IClient[] = [];
+  const otherConnections: Record<IClient['id'], IClient[]> = {};
+
+  let currentGameState: any = null;
+
   app.get('/', (req, res) => {
-    res.send('<h1>Server running</h1>');
+    res.send(indexHtml(connections));
     res.end();
   });
 
   http.listen(port, () => {
-    console.log(`server listening at port ${port}`);
+    log(`server listening at port ${port}`);
   });
 
-  const games: IGameInstance[] = [];
-  const connections: IClient[] = [];
-
   io.sockets.on('connection', socket => {
+    const initialServerMessage: UpdateStateServerMessage = {
+      type: 'update-state',
+      data: { state: currentGameState },
+    };
+    socket.send(initialServerMessage);
+
     const client: IClient = {
       id: uuid(),
       socket,
     };
 
+    registerConnection(client, connections, otherConnections);
+
+    socket.on('disconnect', () => {
+      registerDisconnection(client, connections, otherConnections);
+    });
+
     let game: IGameInstance;
     const ticket: ITicket = { gameId: '', deck: [] };
 
-    console.log(`client with id ${client.id} has connected`);
-
     const processClientMessageMap: ProcessClientMessageMap = {
+      'update-state': message => {
+        const serverMessage: UpdateStateServerMessage = {
+          type: 'update-state',
+          data: { state: message.data.state },
+        };
+
+        currentGameState = message.data.state;
+
+        log(`received update state message from ${client.id}; ${JSON.stringify(message.data.state)}`);
+
+        otherConnections[client.id].forEach(c => c.socket.send(serverMessage));
+      },
       'create-game': message => {
         createGame(io, games, uuid());
       },
@@ -59,8 +131,6 @@ export const startGameServer = (port: string | number = PORT) => {
       processClientMessageMap,
     );
 
-    Object.keys(processClientMessageMap).forEach(type =>
-      socket.on(type, processClientMessage)
-    );
+    socket.on('message', processClientMessage);
   });
 };

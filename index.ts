@@ -4,6 +4,4 @@ import { startGameServer } from './src/api';
 
 const gameContainer = new GameContainer(getInitialState([]));
 
-console.log(gameContainer.getLatestState());
-
 startGameServer();
