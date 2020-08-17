@@ -1,6 +1,6 @@
 import 'ws';
 import socketIo from 'socket.io';
-import { v1 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { IGameInstance, IClient, ITicket } from './state';
 import { createGame, joinGame, applyEffect } from './game';
 import { createMessageHandler, ProcessClientMessageMap, UpdateStateServerMessage } from 'anno-fungi-game-common';
